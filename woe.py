@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as st
+import copy
 from grouping import Grouping
 
 
@@ -64,7 +65,7 @@ class WeightsOfEvidence(object):
 
         for col in self.columns:
             # Calculate WoE for each column
-            woe_df = self.df.groupby(col)[target].agg(['count', 'sum']).reset_index()
+            woe_df = self.df.groupby(col, observed=False)[target].agg(['count', 'sum']).reset_index()
             woe_df.columns = [col, 'total_count', 'event_count']
 
             woe_df['non_event_count'] = woe_df['total_count'] - woe_df['event_count']
@@ -90,7 +91,7 @@ class WeightsOfEvidence(object):
         z_value = st.norm.ppf(confidence)
 
         # Taking copy so original is not edited
-        _copy = self.woe_dict.copy()
+        _copy = copy.deepcopy(self.woe_dict)
         for key, val in _copy.items():
 
             # Calculate standard error
