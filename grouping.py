@@ -54,7 +54,7 @@ class Grouping(object):
             # Assign categorical group based on which leaf the value falls into
             df[f"{column}_grouped"] = tree_classifier.apply(df.loc[:, column].values.reshape(-1, 1))
 
-            return df
+        return df
 
     def binning(self, df, n_bins):
         for column in self.cols_to_group:
