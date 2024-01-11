@@ -41,22 +41,28 @@ class WeightsOfEvidence(object):
     """
 
     def __init__(self, df, columns, target, grouping_method=None, depth=2, min_samples=1,
-                 random_state=10, n_bins=2):
+                 random_state=10, n_bins=2, add_data=None):
+
+        # Ensure there are no missings for either target or the columns to transform
+        assert (df.loc[:, columns].isnull().sum() > 0).sum() == 0 and df.loc[:, target].isnull().sum() == 0, \
+            'Missing values found in either columns or target. Deal with these before calling transformation.'
 
         # Will be an empty list if no numeric variables are being grouped
         self.numeric_columns = df.loc[:, columns].select_dtypes(include='number').columns.tolist()
         if grouping_method is not None:
             grouper = Grouping(df, self.numeric_columns, target, method=grouping_method, depth=depth,
-                               min_samples=min_samples, random_state=random_state, n_bins=n_bins)
+                               min_samples=min_samples, random_state=random_state, n_bins=n_bins, add_data=add_data)
             self.df = grouper.df
 
+            # If additional data is wanted, apply grouping here
+            self.add_data = grouper.add_data
             self.columns = [f'{col}_grouped' if col in self.numeric_columns else col for col in columns]
         else:
             self.columns = columns
             self.df = df
 
         self.woe_dict = self.calculate_woe(target)
-        self.df = self.assign_woe()
+        self.df, self.add_data = self.assign_woe()
 
     def calculate_woe(self, target):
 
@@ -82,9 +88,15 @@ class WeightsOfEvidence(object):
 
     def assign_woe(self):
 
-        for key, val in self.woe_dict.items():
-            self.df[f'{key}_woe'] = self.df[key].map(val.set_index(key)['woe'])
-        return self.df
+        # Taking copy so original is not edited
+        _copy = copy.deepcopy(self.woe_dict)
+        for key, val in _copy.items():
+            self.df[f'{key.replace("_grouped", "")}_woe'] = self.df[key].map(val.set_index(key)['woe'])
+
+            if self.add_data is not None:
+                self.add_data[f'{key.replace("_grouped", "")}_woe'] = self.add_data[key].map(val.set_index(key)['woe'])
+
+        return self.df, self.add_data
 
     def plot_woe(self, confidence=0.975):
 
