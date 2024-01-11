@@ -122,9 +122,9 @@ class WeightsOfEvidence(object):
 
             # Create a table with count and percentage information if the variable is numeric and grouped
             if key.replace("_grouped", "") in self.numeric_columns:
-                table_data = [["Category", "Lower Bound", "Upper Bound", "Count", "Exit Rate (%)"]]
+                table_data = [["Category", "Lower Bound", "Upper Bound", "Count", "Event Rate (%)"]]
             else:
-                table_data = [["Category", "Count", "Exit Rate (%)"]]
+                table_data = [["Category", "Count", "Event Rate (%)"]]
 
             for category_value in val[key]:
 
