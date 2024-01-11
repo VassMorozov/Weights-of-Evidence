@@ -30,4 +30,5 @@ The weights of evidence for all columns can be plotted using ```woe.plot_woe()``
 This example shows the plot for a categorical and numeric variable, where the numeric variable was grouped as previously described.
 
 ## Notes
-Future releases may incorporate additional grouping mechanisms.
+*No missing values should be present in either the columns to transform or the target variable. This class expects missings to be treated prior to calling.
+*Future releases may incorporate additional grouping mechanisms.
