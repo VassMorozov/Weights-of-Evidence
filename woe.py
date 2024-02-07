@@ -58,6 +58,7 @@ class WeightsOfEvidence(object):
             self.add_data = grouper.add_data
             self.columns = [f'{col}_grouped' if col in self.numeric_columns else col for col in columns]
         else:
+            self.add_data = None
             self.columns = columns
             self.df = df
 
